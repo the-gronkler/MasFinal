@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backend", "Backend\Backend.csproj", "{4FFF0BAB-1905-4819-9893-C098B59DF791}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{63FD0BAA-331F-4BF2-953A-DC0F493F77DB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{B6A24FB6-FEC1-4263-9469-B4B00156CB49}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4FFF0BAB-1905-4819-9893-C098B59DF791}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FFF0BAB-1905-4819-9893-C098B59DF791}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4FFF0BAB-1905-4819-9893-C098B59DF791}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4FFF0BAB-1905-4819-9893-C098B59DF791}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

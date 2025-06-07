@@ -1,0 +1,384 @@
+MAS Final Project Documentation
+Oleksandr Svirin s28259
+
+
+________________
+User Requirements
+This is a system intended to help simulate illicit political activity, focusing on modeling under the table deals between politicians and oligarchs. For evaluating ramifications of the deals, the system also models legislation (bills), political organisations, and businesses. 
+The system is designed as an initial limited implementation of the idea, so the ‘extensibility’ of the system design is an important factor. 
+
+
+1. Person: each individual in the system is stored as a "Person," for whom we record their name and age. A Person can take on specific roles:
+
+Politician: If a Person is a Politician, we also track their influence score. This score is a whole number from 1 to 10 and is manually updated by a system administrator based on expert political analysis.
+Oligarch: If a Person is an Oligarch, we also record their wealth.
+
+It's possible for a single Person to be both a Politician and an Oligarch simultaneously, but a person cannot be neither. A person can change roles over time.
+If a person leaves their role, all role-specific data and associations (except Deal) are lost.
+As such, if a person rejoins a previously held role, none of their previous data will be there(except deals), including but not limited to Bills, Party and Movement memberships, and owned Businesses.
+
+2. Deal: An Oligarch may ‘propose’ a Deal with a Politician. A deal has Description(optional) DateProposed, DateDecided and DealLevel (integer between 1 and 5; 1 - most expensive, 5 - least expensive), as well as Status. 
+
+A newly proposed deal is recorded with all attributes except DateDecided, and with status = PreScreening.
+
+The Oligarch may be immediately pre-approved by the system as eligible to propose a deal of that level(based on wealth and assets owned), in which case the deal ‘Status’ is changed to ‘Pending Decision’
+
+If not pre-approved, they can select up to three politicians previously dealt with, that can showcase the trustworthiness and influence of this Oligarch. 
+
+If the selection is accepted by the system’s automatic evaluation algorithm, the deal status is changed to ‘PendingDecision’, if not - to ‘AutoRejected’
+
+A Politician can view any Deals proposed to them and choose to either accept or decline each one. The politician may also override the System’s decision and accept an ‘AutoRejected’ deal. The date of the Politician's decision is then recorded. 
+
+If a Person is both an Oligarch and a Politician, they cannot propose a Deal to themselves.
+It's possible for the same Oligarch and Politician to have multiple Deals between them over time.
+If one of the participants for a given deal leaves their role, the deal must remain in the system
+
+3. Bill: A politician may ‘propose’ a bill, with name and description. We store which politician proposed the bill.
+If a person stops being a politician, the bill ‘proposer’ will become null
+
+Other politicians can either support or oppose the bill, but not both (obviously). 
+Once a politician takes a stance on a bill, they cannot become neutral again.
+An administrator can change the status of a bill to either ‘Passed’ or ‘Rejected’.
+
+4. Political Organisation: The system stores 2 types of political organisations: Party and Movement. 
+
+Every Political Organisation (whether a Party or a Movement) has a PoliticalAffiliation, chosen from (FarLeft, Left, CenterLeft, Center, CenterRight, Right, or FarRight), and a Name, which must be unique across all organisations in the system.
+
+For every Political Organisation, the system can calculate its influence using a special algorithm. The calculation method is different for Parties compared to Movements.
+
+A movement is a less organised political organisation, it has a Main Issue, and a Target Demographic. It may be supported by other political organisations. 
+
+A Party is an officially registered organisation, for it we store the number of parliament seats it controls, whether it is currently participating in a presidential election, and up to 3 primary branding colours. 
+
+A Politician may be a member of as many Movements as they want, but of maximum 1 Party. A Party must have at least 1 member, while a Movement can have 0 recorded members.
+
+For both party and movement members we store membership start date, and optionally end date. If a politician leaves and rejoins, we store the previous membership period as well.
+For each Party member we also store their position in the party (Leader, Spokesperson, Treasurer, or just Member). For Movement members, we only store whether they are a Movement leader, or just a supporter.
+
+5. Business: An Oligarch may own any number of Businesses. Each Business is owned by exactly one Oligarch and has a name. When Oligarch is deleted, or leaves the oligarch role, we remove the owned Businesses. Businesses cannot change owners.
+
+Businesses can employ many workers. Each Worker is employed at a Business, and cannot change their workplace. When a business is removed, all workers employed there are also ‘Removed’ from the system.
+
+For workers we store: position, wage, and, optionally, name. Workers also have an attribute minimum wage which is the same for every worker. Worker wage cannot be lower than minimum wage. 
+Each business has an attribute average wage, which is the average wage of all workers employed at that business.
+________________
+
+Use Case Diagram
+________________
+
+Class Diagram - Analytical
+________________
+
+Class Diagram - Design
+________________
+
+
+Use Case Scenario
+Use Case Scenario for 'Make Deal'
+
+
+Actor(s): Oligarch
+
+
+Purpose and context:
+Make a 'Deal' with a politician
+
+
+Assumption(s):
+Actor is an Oligach already in the system.
+Actor will not impersonate other Oligarchs (we have 'honor system' policy)
+
+
+Pre-Condition(s):
+There is at least 1 oligarch and 1 politician in the system, who are NOT the same person
+
+
+Initiating business event: 
+Oligrach presses on 'Make a Deal'  
+
+
+Basic flow of events
+   1. Actor selects themselves (Oligarch) and a Politician to make a Deal with
+   2. System displays Deal history between selected entities
+   3. Actor presses 'make deal' button
+   4. Actor inputs Deal details
+   5. System records Deal with ‘Pre-Screening’ Status (for data integrity)
+   6. System ensures that this Oligrach is eligible to make such a Deal this Politician
+   7. System sets Deal status to 'Pending Decision' 
+   8. System displays Deal history between selected entities
+
+
+Alternative flow of events: 
+        - 6.1 This oligarch is not immediately eligible for this deal
+                -6.1a System informs actor
+                -6.1b Actor Selects up to 3 Politicians they dealt with before
+                -6.1c System calculates confidence score
+                -6.1d System ensures that confidence score is high enough
+                -6.1e Go to step 7
+
+
+        - 6.1d.1 Confidence score not high enough
+                -6.1d.1a System sets Deal status to 'AutoRejected' 
+                -6.1d.1a System notifies actor that he failed to prove eligibility
+                -6.1d.1b go to step 8
+
+
+Post condition:
+A new Deal is recorded with 'pending' status
+
+
+Alternative post condition:
+6.1d.1 Confidence score not high enough
+A new Deal is recorded with 'AutoRejected' status
+Activity Diagram
+________________
+  
+State Diagram  
+
+________________
+
+GUI Design
+In this chapter you will find GUI design mockups for the selected use case. Since the system is intended to be a scientific modelling tool, and focuses on maximum extensibility, it is important to make future UI changes as easy as possible.
+
+To that end the system leverages the powerful Windows Forms framework.
+
+
+Screen1: Select Oligarch and Politician
+  
+Screen2: See Deal History
+
+Screen3: Input Deal Details
+  
+3.5 (information pop-up) - Inform Actor
+
+Screen4: See deal history again
+  
+Alternative Flow: Select Politicians (After screen3)
+  
+________________
+
+Design Decisions 
+
+Choice of Technologies
+The system is implemented in C# as a console application. Entity Framework ORM with SQLite database were chosen to persist data. The following design decisions were made with the strengths and limitations of these technologies in mind. 
+
+
+Gui: Windows Forms Was Chosen as the GUI solution for the following reasons
+   * C#
+   * Easy to work with
+   * Allows for rapid design iteration 
+(as stated in the introduction, this system focuses on extensibility)
+
+
+It has 3 downsides: desktop(as opposed to web), windows exclusivity, and limited customization. Given that the system is a scientific modelling application, and that it focuses on extensibility, these downsides are not as important. 
+
+The following is a breakdown of strategies used to adapt analytical UML concepts, so that they can be implemented using chosen technologies.
+Attributes
+UML Attribute implementation in C# is unique due to the presence of a special class member - a property. A property provides a way to encapsulate getters and setters for a given attribute in a single member.
+
+Since EntityFramework is used, all attributes in the system are implemented as auto-properties: properties without explicit backing fields (they are autogenerated by the compiler).
+
+Attribute validation is defined using Data Annotations.
+
+Example: 
+   [Required(ErrorMessage = "Business name is required.")]
+   [StringLength(150, MinimumLength = 1, ErrorMessage = "Business name must be between 1 and 150 characters.")]
+   public string Name { get; set; }
+	
+
+Optional
+Optional attributes, such as EndDate in PartyMembership and MovementMembership or the Name of a Worker, are implemented using nullable types in C# (e.g., DateTime?, string?). This allows the absence of a value to be explicitly represented in both the application logic and the database schema generated by Entity Framework.
+
+
+Complex
+Complex attributes are used to encapsulate complex data in a single attribute. This system for example uses DateTime, to store specific dates.
+Derived
+Derived attributes, such as AverageWage in the Business class, are implemented using expression-bodied properties - read-only properties that compute their value on demand.
+
+   public double AverageWage => Workers.Any() 
+       ? Workers.Average(worker => worker.Wage) 
+       : 0;
+	
+
+MultiValue
+Multi-value attributes, such as PrimaryColors for a Party (allowing up to three colors), are implemented using collection types like List<string> in C#.
+Classes
+Classes are implemented as EntityFramework Model Classes. To each class Id attribute is added (PoliticalMovement and party inherit their Id attribute from political movement parent class).
+
+Class extents are defined as properties in DbContext:
+For example: 
+...
+public DbSet<Business> Businesses { get; set; }
+public DbSet<Worker> Workers { get; set; }
+...
+	
+
+Methods
+Data access and modification methods are moved to corresponding Repository classes, and Business logic methods are moved to Service classes, adhering to separation of concerns and single-responsibility principles.
+________________
+Associations
+Associations are handled by the EntityFramework ORM using Primary and Foreign Keys. In memory associations are defined with ‘Navigation Properties’.
+
+These are defined and configured in DbContext.OnModelCreating(ModelBuilder)
+
+ ...
+ // --- Basic Association: oligarch owns many Businesses —
+// not currently accurate to the user requirements, 
+// but serves as a good example
+       modelBuilder.Entity<Business.Business>()
+           .HasOne(b => b.Owner)
+           .WithMany(o => o.OwnedBusinesses)
+           .HasForeignKey(b => b.OligarchId)
+           .IsRequired()
+           .OnDelete(DeleteBehavior.Cascade);
+ ...
+	
+
+
+
+Basic
+Example (Worker 0..* -> 1 Business):
+
+In Worker(Foreign key annotation is optional if the FK property is conventionally named):
+    [ForeignKey("Business")]
+   public int BusinessId { get; set; }
+   [Required]
+   public virtual Business Business { get; set; }
+	
+
+In Business :
+     public virtual ICollection<Worker> Workers { get; set; } = 
+        new List<Worker>();
+	
+
+Composition
+Composition represents a strong link between objects. One object is the ‘Whole’, and the other is the ‘Part’. The part must be related to exactly 1 whole, and cannot change which ‘whole’ it is related to. When the ‘Whole’ object is deleted, the related ‘Parts’ are also deleted.
+
+To implement this in EntityFramework, we set the ‘Whole’ side as mandatory, don’t implement methods for changing associations, and set delete behavior to ‘Cascade’.
+
+       // --- Composition: business has many workers ---
+       modelBuilder.Entity<Worker.Worker>()
+           .HasOne(w => w.Business)
+           .WithMany(b => b.Workers)
+           .HasForeignKey(w => w.BusinessId) 
+           .IsRequired()
+           .OnDelete(DeleteBehavior.Cascade);
+	Many-to-Many
+Association which has maximum cardinality of at least 2 on both sides of the association.
+
+While it can be modelled in C#(the same way as basic association, just with lists on both sides), it cannot be directly implemented in a relational database. 
+The necessary joining table will be generated by the ORM.
+Some examples for these associations include Bill(s) opposed and supported by Politicians.
+
+
+With Attribute
+An association with attribute is a many-to-many association which stores additional information for each pair of objects, in an association class.
+
+In this system it is used for the Party and PoliticalMovement Membership associations, as well as Deals association.
+
+This is not possible to implement in C# directly, so an association class is created:
+  
+This maps directly to the ER database.
+Dynamic and Overlapping Inheritance
+(Person -> Politician, Oligarchs)
+C# supports class-based, single inheritance. However, UML concepts like dynamic and overlapping inheritance, where an object can change its type or belong to multiple subtypes at the same time, are not possible to implement in C# as is. Therefore, specific design strategies are employed.
+
+
+UML allows a Person to dynamically become a Politician or an Oligarch, and even be both at the same time (overlapping). 
+
+A C# object, once instantiated, is of a fixed type and cannot change its type dynamically, nor can a single instance be of multiple distinct concrete derived classes.
+
+
+To model this, the system uses the strategy "flattening", where all the attributes, associations and methods from the inheritance hierarchy (Person, Oligarch and Politician) are put into the now concrete Person class. Role specific attributes are made optional (influence score, and wealth). Mandatory associations transferred from child classes would also have been made optional, if any were present,
+
+Roles are handled by creating an Enum PersonType [Person, Oligach], and a Set of type PersonType in the flattened Person class. The ‘abstractness’ of  class Person is maintained by enforcing at least 1 value in the Enum Set.
+
+Appropriate constructors are created for every combination of roles.
+
+To make this already flattened overlapping inheritance dynamic, role changing methods need to be created: 
+BecomeOligarch(wealth), BecomePolitician(influenceScore), QuitAsOligarch(), QuitAsPolitician().
+These will add or remove appropriate values from the Enum Set, as well as set/unset the appropriate attributes
+
+The state transitions are illustrated on the state diagram above.
+Static Disjoint Inheritance
+(PoliticalOrganisation -> Party, Movement)
+
+This represents a standard is-a relationship. PoliticalOrganisation is an abstract C# class defining common elements, while Party and Movement are concrete classes inheriting from it. This UML construct is possible to implement in C# without adaptation.
+
+
+For mapping this hierarchy to a relational database with Entity Framework Core, the Table-Per-Type (TPT) strategy is employed. 
+
+It is used over the alternative(table per hierarchy TPH - another form of flattening) because the hierarchy is complex enough. 
+
+Specifically, the ‘organisation supports association’, in addition to the 2 membership associations with attribute, is what complicates the hierarchy to the point where the extra table overhead from TPT is worth it to avoid class/table bloat in TPH. 
+
+
+Polymorphic Method Call, Abstract Class
+
+
+The method PoliticalOrganisation.CalculateInfluence(), is called polymorphycally by PoliticalMovement.CalculateInfluence(), which takes into account the calculated political influence of supporting organisations, regardless of type.
+________________
+Constraints
+Static attribute constraint
+A constraint on an attribute. The constraint relies on hardcoded data.
+An example from the system would be: Politician.InfluenceScore {1 - 10} 
+
+
+   [Range(1, 10, ErrorMessage = "InfluenceScore must be between 1 and 10.")]
+   public int InfluenceScore { get; set; }
+	Dynamic attribute constraint
+An attribute constraint verifying attribute 1 against another static attribute.
+An example from the system would be:
+
+Class Worker:
+MinimumWage 
+Wage {wage >= minwage} 
+Unique constraint
+As used in the system, it is a constraint ensuring that a given attribute is unique among all instances of a class. This will be enforced with validation checks in the Repository class.
+
+
+In the system it is used on PoliticalOrganisation.Name().
+
+
+XOR constraint
+This constraint is usable on 2 or more associations(or optional attributes), it enforces that only 1 of the selected associations may exist between a given pair of objects. 
+
+In the system it is used on ‘Oppose Bill’ and ‘Support Bill’ associations, since a politician cannot both support and oppose the same bill.
+
+It is implemented with an extra validation check when creating either of the associations.
+BAG constraint
+This is a constraint usable on many to many associations, most often on associations with attributes.
+It specifies that between a given pair of objects involved in the association, more than 1 association may exist(normally only 1 can exist). Implementing it involves not putting checks for duplicate associations that would normally be there.
+
+In the system it is used on the 2 membership associations, as well as the deal association. 
+
+________________
+The Effect of Dynamic Analysis
+
+
+After performing dynamic analysis I have found that the following methods need to be introduced to facilitate implementation of the selected use case, and other closely linked use cases:
+
+Oligarch:
+      * ProposeDeal()
+      * GetPoliticiansDealtWith()
+
+
+Politician:
+      * ShowPendingDeals()
+      * AcceptDeal()
+      * DeclineDeal()
+
+
+
+
+During dynamic analysis additional ‘Deal’ states were discovered and introduced to the system: 
+
+      * ‘Pre-Screening’ - to avoid data loss if system crashes during automated deal pre-screening
+      * ‘Auto-Rejected’ - to distinguish deals automatically rejected by the system, from deals declined by the politician, and allow the politician to override the system decision.
+        
+
+To facilitate all the state transitions the following methods were added to Deal class:
+      * PreApprove()
+      * AutoReject()
+      * Accept()
+      * Decline()
