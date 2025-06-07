@@ -59,7 +59,7 @@ public class Person
     public virtual ICollection<PartyMembership> PartyMemberships { get; set; } = new List<PartyMembership>();
     public virtual ICollection<MovementMembership> MovementMemberships { get; set; } = new List<MovementMembership>();
 
-    [InverseProperty("ProposingOligarch")]
+    [InverseProperty("Proposer")]
     public virtual ICollection<Deal> DealsProposed { get; set; } = new List<Deal>();
 
     // <--- Oligarch --->
@@ -68,6 +68,6 @@ public class Person
 
     public virtual ICollection<Business> OwnedBusinesses { get; set; } = new List<Business>();
 
-    [InverseProperty("ReceivingPolitician")]
-    public virtual ICollection<Deal> DealsReceived { get; set; } = new List<Deal>();
+    [InverseProperty("Recipient")]
+    public virtual ICollection<Deal> DealsReceived{ get; set; } = new List<Deal>();
 }

@@ -16,33 +16,31 @@ public class Deal
 {
 
     [Key]
-    public int DealId { get; private set; }
+    public int DealId { get; set; }
 
-    public string? Description { get; private set; }
+    public string? Description { get; set; }
 
     [Required]
-    public DateTime DateProposed { get; private set; }
+    public DateTime DateProposed { get; set; }
     
-    public DateTime? DateDecided { get; private set; }
+    public DateTime? DateDecided { get; set; }
 
     [Required]
     [Range(1, 5, ErrorMessage = "Deal Level must be between 1 and 5.")]
-    public int DealLevel { get; private set; }
+    public int DealLevel { get; set; }
 
     [Required]
-    public DealStatus Status { get; private set; }
+    public DealStatus Status { get; set; }
     
     [Required]
-    public int ProposingOligarchId { get; private set; }
-
-    [ForeignKey(nameof(ProposingOligarchId))]
-    public virtual Person ProposingOligarch { get; private set; }
+    public int ProposerId { get; set; }
+    [ForeignKey(nameof(ProposerId))]
+    public virtual Person Proposer { get; set; }
 
     [Required]
-    public int ReceivingPoliticianId { get; private set; }
-
-    [ForeignKey(nameof(ReceivingPoliticianId))]
-    public virtual Person ReceivingPolitician { get; private set; }
+    public int RecipientId { get; set; }
+    [ForeignKey(nameof(RecipientId))]
+    public virtual Person Recipient { get; set; }
 
     
     // --- State transition methods ---
