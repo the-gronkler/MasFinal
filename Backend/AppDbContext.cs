@@ -26,7 +26,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<StaticAttribute> StaticAttributes { get; set; }
 
 
-    private static string DbPath => Path.Join(
+    public static string DbPath => Path.Join(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), 
         "mas.db"
         );
