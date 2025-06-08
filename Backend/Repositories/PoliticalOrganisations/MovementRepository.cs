@@ -1,3 +1,4 @@
+using MasFinal.Data;
 using MasFinal.Models.PoliticalOrganisation;
 using MasFinal.RepositoryContracts.PoliticalOrganisations;
 using Microsoft.EntityFrameworkCore;

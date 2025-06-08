@@ -1,3 +1,4 @@
+using MasFinal.Data;
 using MasFinal.Models;
 using MasFinal.RepositoryContracts;
 using Microsoft.EntityFrameworkCore;

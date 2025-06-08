@@ -3,7 +3,7 @@ using MasFinal.Models.Businesses;
 using MasFinal.Models.PoliticalOrganisation;
 using Microsoft.EntityFrameworkCore;
 
-namespace MasFinal;
+namespace MasFinal.Data;
 
 
 public class AppDbContext(DbContextOptions<AppDbContext> options) 
@@ -126,16 +126,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
         
         
         // -- Constraints --
-        
         // -- Unique --
         modelBuilder.Entity<PoliticalOrganisation>().HasIndex(o => o.Name).IsUnique();
-
-        // -- Check --
-        // modelBuilder.Entity<Deal>()
-        //     .ToTable(tb => tb.HasCheckConstraint("CK_Deal_Participants", "[OligarchId] <> [PoliticianId]"));
-        //
-        // modelBuilder.Entity<Worker>()
-        //     .ToTable(tb => tb.HasCheckConstraint("CK_Worker_Wage", "[Wage] >= [MinimumWage]"));
-
+        
     }
 }

@@ -1,3 +1,4 @@
+using MasFinal.Data;
 using MasFinal.RepositoryContracts;
 
 namespace MasFinal.Repositories;

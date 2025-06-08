@@ -1,4 +1,4 @@
-namespace MasFinal;
+namespace MasFinal.Data;
 
 public interface IDataDisplayer
 {
