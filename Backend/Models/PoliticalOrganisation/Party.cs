@@ -9,8 +9,7 @@ public class Party : PoliticalOrganisation
     public bool IsParticipatingInElection { get; set; }
 
     public ICollection<string> PrimaryColors { get; set; } = new List<string>();
-
-
+    
     public virtual ICollection<PartyMembership> Memberships { get; set; } = new List<PartyMembership>();
 
     public override double CalculateInfluence()

@@ -23,11 +23,10 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     
     public DbSet<Business> Businesses { get; set; }
     public DbSet<Worker> Workers { get; set; }
-    
-    
-    public static string DbPath => Path.Join(
-        Environment.GetFolderPath(
-            Environment.SpecialFolder.LocalApplicationData), 
+
+
+    private static string DbPath => Path.Join(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), 
         "mas.db"
         );
 
@@ -46,8 +45,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
         modelBuilder.Entity<PoliticalOrganisation>().ToTable("PoliticalOrganisations");
         modelBuilder.Entity<Party>().ToTable("Parties");
         modelBuilder.Entity<Movement>().ToTable("Movements");
-
-
+        
+        
         
         // -- Deal (Association Class) --
         modelBuilder.Entity<Deal>()
