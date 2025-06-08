@@ -23,6 +23,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     
     public DbSet<Business> Businesses { get; set; }
     public DbSet<Worker> Workers { get; set; }
+    public DbSet<StaticAttribute> StaticAttributes { get; set; }
 
 
     private static string DbPath => Path.Join(
@@ -40,7 +41,10 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-
+        
+        modelBuilder.Entity<StaticAttribute>()
+            .ToTable("StaticAttributes");
+        
         // -- PoliticalOrganisation TPT Inheritance --
         modelBuilder.Entity<PoliticalOrganisation>().ToTable("PoliticalOrganisations");
         modelBuilder.Entity<Party>().ToTable("Parties");

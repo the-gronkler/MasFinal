@@ -5,7 +5,6 @@ namespace MasFinal.Repositories;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
-
 public class Repository<T> : IRepository<T> where T : class
 {
     protected readonly AppDbContext _context;
@@ -32,12 +31,12 @@ public class Repository<T> : IRepository<T> where T : class
         return await _dbSet.Where(predicate).ToListAsync();
     }
 
-    public async Task AddAsync(T entity)
+    public virtual async Task AddAsync(T entity)
     {
         await _dbSet.AddAsync(entity);
     }
 
-    public void Update(T entity)
+    public virtual void Update(T entity)
     {
         _dbSet.Attach(entity);
         _context.Entry(entity).State = EntityState.Modified;

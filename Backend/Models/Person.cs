@@ -70,4 +70,8 @@ public class Person
 
     [InverseProperty("Recipient")]
     public virtual ICollection<Deal> DealsReceived{ get; set; } = new List<Deal>();
+    
+    // helper methods
+    public bool IsPolitician() => Types.Contains(PersonType.Politician);
+    public bool IsOligarch() => Types.Contains(PersonType.Oligarch);
 }
