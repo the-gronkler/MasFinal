@@ -1,11 +1,12 @@
-﻿using MasFinal;
-using MasFinal.Data;
+﻿using MasFinal.Data;
 using MasFinal.Repositories;
 using MasFinal.Repositories.Businesses;
 using MasFinal.Repositories.PoliticalOrganisations;
 using MasFinal.RepositoryContracts;
 using MasFinal.RepositoryContracts.Businesses;
 using MasFinal.RepositoryContracts.PoliticalOrganisations;
+using MasFinal.ServiceContracts;
+using MasFinal.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -57,8 +58,7 @@ ServiceProvider ConfigureServices()
             .LogTo(Console.WriteLine, LogLevel.Error)  
             .EnableSensitiveDataLogging()
     );
-
-    // register repos
+    
     services.AddScoped<IPersonRepository, PersonRepository>();
     services.AddScoped<IDealRepository, DealRepository>();
     services.AddScoped<IBillRepository, BillRepository>();
@@ -68,6 +68,9 @@ ServiceProvider ConfigureServices()
     
     services.AddScoped<IBusinessRepository, BusinessRepository>();
     services.AddScoped<IWorkerRepository, WorkerRepository>();
+    
+    services.AddScoped<IBillService, BillService>();
+    services.AddScoped<IDealService, DealService>();
 
     services.AddScoped<IDataSeeder, DataSeeder>();
     services.AddScoped<IDataDisplayer, DataDisplayer>();
