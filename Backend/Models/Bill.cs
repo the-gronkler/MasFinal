@@ -10,7 +10,7 @@ public enum BillStatus
     Rejected
 }
 
-public class Bill
+public class  Bill
 {
     [Key]
     public int BillId { get; set; }
@@ -24,7 +24,7 @@ public class Bill
     [Required]
     public BillStatus Status { get; set; }
     
-    public int? ProposerId { get; set; }
+    public int? ProposerId { get; set;  }
     [ForeignKey("ProposerId")]
     
     public virtual Person? Proposer { get; set; }
