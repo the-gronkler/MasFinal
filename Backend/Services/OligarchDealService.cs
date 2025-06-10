@@ -70,9 +70,8 @@ public class OligarchDealService(
     {
         if (oligarchId <= 0)
             throw new ArgumentException("Oligarch ID must be greater than zero.");
-
-        var deals = await dealRepository.FindAsync(d => d.ProposerId == oligarchId);
-        return deals.Select(d => d.Recipient).Distinct();
+        
+        return await dealRepository.GetPoliticiansDealtWithByOligarchAsync(oligarchId);
     }
 
     public async Task<Deal> ProveDealEligibilityAsync(int dealId, List<int> selectedPoliticians)
