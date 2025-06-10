@@ -13,7 +13,7 @@ public class DealRepository(AppDbContext context)
     /// <summary>
     /// Adds a new deal, performing validation checks.
     /// </summary>
-    public override async Task AddAsync(Deal deal)
+    public override async Task<Deal> AddAsync(Deal deal)
     {
         if (deal.ProposerId == deal.RecipientId)
             throw new InvalidOperationException("A person cannot propose a deal to themselves.");
@@ -32,7 +32,7 @@ public class DealRepository(AppDbContext context)
             throw new InvalidOperationException($"The recipient (ID: {recipient.PersonId}) must be a Politician.");
 
 
-        await base.AddAsync(deal);
+        return await base.AddAsync(deal);
     }
 
     public async Task<IEnumerable<Person>> GetPoliticiansDealtWithByOligarchAsync(int oligarchId)

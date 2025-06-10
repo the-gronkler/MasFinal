@@ -32,9 +32,9 @@ public class Repository<T> : IRepository<T> where T : class
         return await _dbSet.Where(predicate).ToListAsync();
     }
 
-    public virtual async Task AddAsync(T entity)
+    public virtual async Task<T> AddAsync(T entity)
     {
-        await _dbSet.AddAsync(entity);
+        return (await _dbSet.AddAsync(entity)).Entity;
     }
 
     public virtual void Update(T entity)

@@ -44,7 +44,7 @@ public class Person
     [Range(18, 120)]
     public int Age { get; set; }
     
-    public ICollection<PersonType> Types { get; set; } = new HashSet<PersonType>();
+    public ICollection<PersonType> Types { get; set; } = new List<PersonType>();
 
 
     // <--- Politician --->

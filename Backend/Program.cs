@@ -39,8 +39,8 @@ using (var scope = serviceProvider.CreateScope())
     var dataSeeder = scopedProvider.GetRequiredService<IDataSeeder>();
     var dataDisplayer = scopedProvider.GetRequiredService<IDataDisplayer>(); 
     
-    // await dataSeeder.SeedAsync();
-    // await dataDisplayer.DisplayAsync();
+    await dataSeeder.SeedAsync();
+    await dataDisplayer.DisplayAsync();
     
 }
 

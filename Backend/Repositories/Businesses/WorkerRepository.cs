@@ -18,10 +18,10 @@ public class WorkerRepository(AppDbContext context)
         
     }
 
-    public override async Task AddAsync(Worker entity)
+    public override async Task<Worker> AddAsync(Worker entity)
     {
         ValidateWage(entity);
-        await base.AddAsync(entity);
+        return await base.AddAsync(entity);
     }
 
     /// <summary>

@@ -13,7 +13,7 @@ public class BillRepository(AppDbContext context)
     /// <summary>
     /// Adds a new bill, ensuring the proposer is a politician.
     /// </summary>
-    public override async Task AddAsync(Bill bill)
+    public override async Task<Bill> AddAsync(Bill bill)
     {
         if (bill.ProposerId.HasValue)
         {
@@ -22,7 +22,7 @@ public class BillRepository(AppDbContext context)
                 throw new InvalidOperationException("The proposer of a bill must be a politician.");
             
         }
-        await base.AddAsync(bill);
+        return await base.AddAsync(bill);
     }
 
     public async Task<Bill?> GetBillWithRelationsAsync(int billId)

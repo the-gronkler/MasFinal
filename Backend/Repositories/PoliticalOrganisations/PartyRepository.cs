@@ -13,7 +13,7 @@ public class PartyRepository (AppDbContext context)
     /// Adds a new Party, enforcing creation-time constraints.
     /// A Party must be created with a unique name and at least one member.
     /// </summary>
-    public override async Task AddAsync(Party party)
+    public override async Task<Party> AddAsync(Party party)
     {
         // A Party must have at least 1 member (as per user correction).
         if (party.Memberships == null || party.Memberships.Count == 0)
@@ -24,7 +24,7 @@ public class PartyRepository (AppDbContext context)
         if (await _context.PoliticalOrganisations.AnyAsync(po => po.Name == party.Name))
             throw new InvalidOperationException($"An organization with the name '{party.Name}' already exists.");
         
-        await base.AddAsync(party);
+        return await base.AddAsync(party);
     }
 
     public async Task AddPartyMemberAsync(int partyId, int politicianId, PartyPosition position)

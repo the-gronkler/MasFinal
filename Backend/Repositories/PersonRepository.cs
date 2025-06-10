@@ -10,12 +10,12 @@ public class PersonRepository(AppDbContext context)
     : Repository<Person>(context), IPersonRepository
 {
 
-    public override async Task AddAsync(Person person)
+    public override async Task<Person> AddAsync(Person person)
     {
         if (person.Types == null || person.Types.Count == 0)
             throw new InvalidOperationException("A person must be created with at least one role (Politician or Oligarch).");
         
-        await base.AddAsync(person);
+        return await base.AddAsync(person);
     }
     
     public async Task<Person?> GetPersonWithDetailsAsync(int personId)

@@ -9,13 +9,13 @@ public class MovementRepository(AppDbContext context)
     : Repository<Movement>(context), IMovementRepository
 {
     
-    public override async Task AddAsync(Movement movement)
+    public override async Task<Movement> AddAsync(Movement movement)
     {
         // The  name must be unique across all PoliticalOrganisations.
         if (await _context.PoliticalOrganisations.AnyAsync(po => po.Name == movement.Name))
             throw new InvalidOperationException($"An organization with the name '{movement.Name}' already exists.");
         
-        await base.AddAsync(movement);
+        return await base.AddAsync(movement);
     }
     
     public async Task AddMovementMemberAsync(int movementId, int politicianId, bool isLeader)
