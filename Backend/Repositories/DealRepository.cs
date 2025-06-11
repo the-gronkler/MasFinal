@@ -35,6 +35,30 @@ public class DealRepository(AppDbContext context)
         return await base.AddAsync(deal);
     }
 
+
+    public async Task<IEnumerable<Deal>> GetDealsForPerson(int personId)
+    {
+        return await _dbSet
+            .Where(d => d.RecipientId == personId || d.ProposerId == personId)
+            .ToListAsync();
+    }
+
+    public async  Task<IEnumerable<Deal>> GetDealsForPolitician(int politicianId)
+    {
+        return await _dbSet
+            .Where(d => d.RecipientId == politicianId)
+            .ToListAsync();
+    }
+
+    public async  Task<IEnumerable<Deal>> GetDealsForOligarch(int oligarchId)
+    {
+        return await _dbSet
+            .Where(d => d.ProposerId == oligarchId)
+            .ToListAsync();
+    }
+    
+    
+    
     public async Task<IEnumerable<Person>> GetPoliticiansDealtWithByOligarchAsync(int oligarchId)
     {
         return await _context.Deals
@@ -67,4 +91,7 @@ public class DealRepository(AppDbContext context)
                 d.Status == DealStatus.Accepted)
             .ToListAsync();
     }
+    
+    
+    
 }
