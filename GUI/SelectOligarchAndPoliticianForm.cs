@@ -60,4 +60,33 @@ public partial class SelectOligarchAndPoliticianForm : Form
         dealHistoryForm.Initialize(selectedOligarch, selectedPolitician);
         dealHistoryForm.ShowDialog(); 
     }
+    
+    private void showOligarchDealsButton_Click(object sender, EventArgs e)
+    {
+        var selectedOligarch = (Person?)oligarchsListBox.SelectedItem;
+        if (selectedOligarch == null)
+        {
+            MessageBox.Show("Please select an oligarch from the list.", "Selection Required", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
+        }
+        ShowPersonDetails(selectedOligarch);
+    }
+
+    private void showPoliticianDealsButton_Click(object sender, EventArgs e)
+    {
+        var selectedPolitician = (Person?)politiciansListBox.SelectedItem;
+        if (selectedPolitician == null)
+        {
+            MessageBox.Show("Please select a politician from the list.", "Selection Required", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
+        }
+        ShowPersonDetails(selectedPolitician);
+    }
+
+    private void ShowPersonDetails(Person person)
+    {
+        var detailForm = Program.ServiceProvider.GetRequiredService<PersonDealsDetailForm>();
+        detailForm.Initialize(person);
+        detailForm.ShowDialog();
+    }
 }

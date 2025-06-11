@@ -32,7 +32,7 @@ public static class Program
         await Init.InitDb(ServiceProvider);
 
         // Run the main form
-        var mainForm = ServiceProvider.GetRequiredService<global::GUI.SelectOligarchAndPoliticianForm>();
+        var mainForm = ServiceProvider.GetRequiredService<SelectOligarchAndPoliticianForm>();
         Application.Run(mainForm);
     }
 
@@ -64,6 +64,7 @@ public static class Program
 
         // Register Forms
         services.AddTransient<SelectOligarchAndPoliticianForm>();
+        services.AddTransient<PersonDealsDetailForm>();
         services.AddTransient<DealHistoryForm>();
         services.AddTransient<NewDealForm>();
         services.AddTransient<ProveEligibilityForm>();
