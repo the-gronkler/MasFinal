@@ -80,6 +80,33 @@ public class DealEvaluationService(
     
         return confidenceScore >= requiredScore;
     }
+    
+    
+
+    public async Task<int> CleanUpPreScreeningDealsAsync()
+    {
+        var cutoffDate = DateTime.UtcNow.AddHours(-1.2);
+        var orphanedDeals = await dealRepository.FindAsync(d => 
+                d.Status == DealStatus.PreScreening && 
+                d.DateProposed < cutoffDate
+        );
+
+        var deals = orphanedDeals.ToList();
+        
+        var count = deals.Count;
+        if (count == 0)
+            return 0;
+
+        foreach (var deal in deals)
+        {
+            deal.AutoReject();
+            dealRepository.Update(deal);
+        }
+
+        await dealRepository.SaveChangesAsync();
+        
+        return count;
+    }
 }
 
 

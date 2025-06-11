@@ -102,32 +102,4 @@ public class ProposeDealService(
 
         return deal;
     }
-    
-    
-    /// <summary>
-    /// resumes evaluation process for deals in PreScreening status.
-    /// Does not allow for second level evaluation where oligarchs can additionally 'prove' eligibility,
-    /// the decision from 1st level evaluation is final.
-    /// Should be run periodically to ensure no deals are left in PreScreening indefinitely.
-    /// </summary>
-    /// <returns></returns>
-    public async Task ResumePreScreeningDealsAsync()
-    {
-        var orphanedDeals = await dealRepository.FindAsync(d => 
-            d.Status == DealStatus.PreScreening && 
-            (DateTime.UtcNow - d.DateProposed) > TimeSpan.FromHours(1.2)
-        );
-
-        var deals = orphanedDeals.ToList();
-        if (deals.Count == 0)
-            return;
-
-        foreach (var deal in deals)
-        {
-            deal.AutoReject();
-            dealRepository.Update(deal);
-        }
-
-        await dealRepository.SaveChangesAsync();
-    }
 }

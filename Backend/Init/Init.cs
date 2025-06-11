@@ -12,66 +12,82 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace MasFinal.Init;
-
-public static class Init
+namespace MasFinal.Init
 {
-    public static async Task InitDb(IServiceProvider serviceProvider, bool showData = false)
+    public static class Init
     {
-        using var scope = serviceProvider.CreateScope();
+        /// <summary>
+        /// Configures all the services for the application's dependency injection container.
+        /// </summary>
+        /// <returns>A configured IServiceCollection.</returns>
+        public static IServiceCollection ConfigureServices()
+        {
+            var services = new ServiceCollection();
 
-        var scopedProvider = scope.ServiceProvider;
+            services.AddDbContext<AppDbContext>(options =>
+                options.UseSqlite($"Data Source={AppDbContext.DbPath}")
+                       .LogTo(Console.WriteLine, LogLevel.Error)
+                       .EnableSensitiveDataLogging()
+            );
 
-     
+            // Repositories
+            services.AddScoped<IPersonRepository, PersonRepository>();
+            services.AddScoped<IDealRepository, DealRepository>();
+            services.AddScoped<IBillRepository, BillRepository>();
+            services.AddScoped<IPartyRepository, PartyRepository>();
+            services.AddScoped<IMovementRepository, MovementRepository>();
+            services.AddScoped<IBusinessRepository, BusinessRepository>();
+            services.AddScoped<IWorkerRepository, WorkerRepository>();
 
-        var context = scopedProvider.GetRequiredService<AppDbContext>();
-        Console.WriteLine("Ensuring database schema is created...");
-        await context.Database.EnsureCreatedAsync();
-        Console.WriteLine("Confirmed");
+            // Services
+            services.AddScoped<IBillService, BillService>();
+            services.AddScoped<IProposeDealService, ProposeDealService>();
+            services.AddScoped<IDealEvaluationService, DealEvaluationService>();
 
-        // init static members
-        var workerRepository = scopedProvider.GetRequiredService<IWorkerRepository>();
-        Console.WriteLine("Initializing static application data...");
-        await workerRepository.GetMinimumWageAsync();
-        Console.WriteLine(
-            $"Worker.MinimumWage has been initialized to: {Worker.MinimumWage:C}");
-        
-        var dataSeeder = scopedProvider.GetRequiredService<IDataSeeder>();
-        var dataDisplayer = scopedProvider.GetRequiredService<IDataDisplayer>();
+            // Data Helpers
+            services.AddScoped<IDataSeeder, DataSeeder>();
+            services.AddScoped<IDataDisplayer, DataDisplayer>();
 
-        await dataSeeder.SeedIfEmptyAsync();
-        
-        if (showData)
-            await dataDisplayer.DisplayAsync();
-    }
+            return services;
+        }
 
-    public static ServiceProvider ConfigureServices()
-    {
-        var services = new ServiceCollection();
+        /// <summary>
+        /// Initialize  database, ensure schema is created, init static values, seed data if db empty.
+        /// </summary>
+        /// <param name="serviceProvider"></param>
+        /// <param name="showData">If true, displays seeded data in the console.</param>
+        public static async Task InitDbAsync(IServiceProvider serviceProvider, bool showData = false)
+        {
+            using var scope = serviceProvider.CreateScope();
+            var scopedProvider = scope.ServiceProvider;
 
-        services.AddDbContext<AppDbContext>(options =>
-            options.UseSqlite($"Data Source={AppDbContext.DbPath}")
-                .LogTo(Console.WriteLine, LogLevel.Error)
-                .EnableSensitiveDataLogging()
-        );
+            // create db schema if doesnt exist
+            var context = scopedProvider.GetRequiredService<AppDbContext>();
+            Console.WriteLine("Ensuring database schema is created...");
+            await context.Database.EnsureCreatedAsync();
+            Console.WriteLine("Confirmed.");
 
-        services.AddScoped<IPersonRepository, PersonRepository>();
-        services.AddScoped<IDealRepository, DealRepository>();
-        services.AddScoped<IBillRepository, BillRepository>();
+            // Initialize static class members from the database
+            var workerRepository = scopedProvider.GetRequiredService<IWorkerRepository>();
+            Console.WriteLine("Initializing static application data...");
+            await workerRepository.GetMinimumWageAsync();
+            Console.WriteLine($"Worker.MinimumWage has been initialized to: {Worker.MinimumWage:C}");
+            
+            // Normally this would be a scheduled job, but for simplicity, we run it here on app start.
+            var dealEvalService = serviceProvider.GetRequiredService<IDealEvaluationService>();
+            var count = await dealEvalService.CleanUpPreScreeningDealsAsync();
+            Console.WriteLine($"Set {count} old pre-screening deals to AutoRejected");
 
-        services.AddScoped<IPartyRepository, PartyRepository>();
-        services.AddScoped<IMovementRepository, MovementRepository>();
+            // Seed db
+            var dataSeeder = scopedProvider.GetRequiredService<IDataSeeder>();
+            await dataSeeder.SeedIfEmptyAsync();
 
-        services.AddScoped<IBusinessRepository, BusinessRepository>();
-        services.AddScoped<IWorkerRepository, WorkerRepository>();
 
-        services.AddScoped<IBillService, BillService>();
-        services.AddScoped<IProposeDealService, ProposeDealService>();
-        services.AddScoped<IDealEvaluationService, DealEvaluationService>();
-
-        services.AddScoped<IDataSeeder, DataSeeder>();
-        services.AddScoped<IDataDisplayer, DataDisplayer>();
-
-        return services.BuildServiceProvider();
+            if (showData)
+            {
+                var dataDisplayer = scopedProvider.GetRequiredService<IDataDisplayer>();
+                await dataDisplayer.DisplayAsync();
+            }
+        }
     }
 }
