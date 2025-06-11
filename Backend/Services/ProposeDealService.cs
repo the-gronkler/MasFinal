@@ -13,12 +13,12 @@ public class ProposeDealService(
 {
     public async Task<IEnumerable<Person>> GetOligarchsAsync()
     {
-        return await personRepository.FindAsync(p => p.IsOligarch());
+        return await personRepository.FindAsync(p => p.Types.Contains(PersonType.Oligarch));
     }
 
     public async Task<IEnumerable<Person>> GetPoliticiansAsync()
     {
-        return await personRepository.FindAsync(p => p.IsPolitician());
+        return await personRepository.FindAsync(p => p.Types.Contains(PersonType.Politician));
     }
 
     public async Task<IEnumerable<Deal>> GetAllDealsFor(int personId)
@@ -69,7 +69,7 @@ public class ProposeDealService(
             return deal;
         
         deal.PreApprove();
-        dealRepository.Update(deal);
+        // dealRepository.Update(deal);
         await dealRepository.SaveChangesAsync();
 
         return deal;

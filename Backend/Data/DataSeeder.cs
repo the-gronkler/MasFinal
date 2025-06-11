@@ -9,7 +9,7 @@ namespace MasFinal.Data
 {
     public interface IDataSeeder
     {
-        Task SeedAsync();
+        Task SeedIfEmptyAsync();
     }
 
     public class DataSeeder(
@@ -23,7 +23,7 @@ namespace MasFinal.Data
         IWorkerRepository workerRepository
     ) : IDataSeeder
     {
-        public async Task SeedAsync()
+        public async Task SeedIfEmptyAsync()
         {
             // Only seed if there's no data
             if (await personRepository.GetAllAsync() is { } people && people.Any())
