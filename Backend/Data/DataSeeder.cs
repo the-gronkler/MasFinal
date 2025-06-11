@@ -13,7 +13,7 @@ namespace MasFinal.Data
     }
 
     public class DataSeeder(
-        AppDbContext context, // Inject context for a single SaveChanges call
+        AppDbContext context,
         IPersonRepository personRepository,
         IDealRepository dealRepository,
         IBillRepository billRepository,
@@ -25,153 +25,171 @@ namespace MasFinal.Data
     {
         public async Task SeedIfEmptyAsync()
         {
-            Console.WriteLine(AppDbContext.DbPath);
-            // Only seed if there's no data
             if (await personRepository.GetAllAsync() is { } people && people.Any())
                 return;
-            
 
             Console.WriteLine("Database is empty. Seeding sample data...");
 
             // --- 1. Create Persons ---
             var eleanorVance = new Person
-            {
-                Name = "Eleanor Vance", Age = 45, InfluenceScore = 8, Types = { PersonType.Politician }
-            };
+                { Name = "Eleanor Vance", Age = 45, InfluenceScore = 8, Types = { PersonType.Politician } };
             var maximilianSterling = new Person
-            {
-                Name = "Maximilian Sterling", Age = 62, Wealth = 600_000_000, Types = { PersonType.Oligarch }
-            };
+                { Name = "Maximilian Sterling", Age = 62, Wealth = 600_000_000, Types = { PersonType.Oligarch } };
             var isabellaRossi = new Person
             {
                 Name = "Isabella Rossi", Age = 53, InfluenceScore = 9, Wealth = 1_200_000_000,
                 Types = { PersonType.Politician, PersonType.Oligarch }
             };
             var kenjiTanaka = new Person
-            {
-                Name = "Kenji Tanaka", Age = 38, InfluenceScore = 6, Types = { PersonType.Politician }
-            };
+                { Name = "Kenji Tanaka", Age = 38, InfluenceScore = 6, Types = { PersonType.Politician } };
             var sofiaPetrova = new Person
-            {
-                Name = "Sofia Petrova", Age = 51, InfluenceScore = 7, Types = { PersonType.Politician }
-            };
-            eleanorVance = await personRepository.AddAsync(eleanorVance);
-            maximilianSterling = await personRepository.AddAsync(maximilianSterling);
-            isabellaRossi = await personRepository.AddAsync(isabellaRossi);
-            kenjiTanaka = await personRepository.AddAsync(kenjiTanaka);
-            sofiaPetrova = await personRepository.AddAsync(sofiaPetrova);
-            
-            await context.SaveChangesAsync(); // to update person ids
+                { Name = "Sofia Petrova", Age = 51, InfluenceScore = 7, Types = { PersonType.Politician } };
+            var arthurPendleton = new Person
+                { Name = "Arthur Pendleton", Age = 71, Wealth = 2_500_000_000, Types = { PersonType.Oligarch } };
+            var helenaMarkov = new Person
+                { Name = "Helena Markov", Age = 49, InfluenceScore = 5, Types = { PersonType.Politician } };
 
+            await personRepository.AddAsync(eleanorVance);
+            await personRepository.AddAsync(maximilianSterling);
+            await personRepository.AddAsync(isabellaRossi);
+            await personRepository.AddAsync(kenjiTanaka);
+            await personRepository.AddAsync(sofiaPetrova);
+            await personRepository.AddAsync(arthurPendleton);
+            await personRepository.AddAsync(helenaMarkov);
+
+            await context.SaveChangesAsync();
 
             // --- 2. Create Businesses and Workers ---
-            var sterlingEnterprises = new Business { Name = "Sterling Enterprises", Owner = maximilianSterling };
-            sterlingEnterprises.Workers.Add(new Worker { Position = "CEO", Wage = 350_000 });
-            sterlingEnterprises.Workers.Add(new Worker { Name = "John Doe", Position = "Engineer", Wage = 120_000 });
-            sterlingEnterprises.Workers.Add(new Worker { Name = "Jane Smith", Position = "Accountant", Wage = 95_000 });
-            await businessRepository.AddAsync(sterlingEnterprises);
-
-            var rossiInnovations = new Business { Name = "Rossi Innovations", Owner = isabellaRossi };
-            rossiInnovations.Workers.Add(new Worker { Name = "Chen Wei", Position = "Lead Scientist", Wage = 250_000 });
-            rossiInnovations.Workers.Add(new Worker { Name = "Emily White", Position = "HR Manager", Wage = 85_000 });
-            await businessRepository.AddAsync(rossiInnovations);
-
+            await businessRepository.AddAsync(new Business
+                { Name = "Sterling Enterprises", OwnerId = maximilianSterling.PersonId });
+            await businessRepository.AddAsync(new Business
+                { Name = "Rossi Innovations", OwnerId = isabellaRossi.PersonId });
+            await businessRepository.AddAsync(new Business
+                { Name = "Pendleton Global", OwnerId = arthurPendleton.PersonId });
 
             // --- 3. Create Political Organisations and Memberships ---
-            // Create a Party (must have at least one member on creation)
             var centristAlliance = new Party
             {
-                Name = "The Centrist Alliance",
-                PoliticalAffiliation = PoliticalPosition.Center,
-                NumSeatsInParliament = 45,
-                IsParticipatingInElection = true,
-                PrimaryColors = { "Blue", "Gold" }
+                Name = "The Centrist Alliance", PoliticalAffiliation = PoliticalPosition.Center,
+                NumSeatsInParliament = 45
             };
             centristAlliance.Memberships.Add(new PartyMembership
             {
-                Politician = eleanorVance, Position = PartyPosition.Leader, StartDate = DateTime.UtcNow.AddYears(-5)
+                PoliticianId = eleanorVance.PersonId, Position = PartyPosition.Leader,
+                StartDate = DateTime.UtcNow.AddYears(-5)
             });
-            await partyRepository.AddAsync(centristAlliance);
+            await partyRepository.AddAsync(centristAlliance );
 
-            // Create a Movement
             var greenMovement = new Movement
             {
-                Name = "Green Future Initiative",
-                PoliticalAffiliation = PoliticalPosition.CenterLeft,
-                MainIssue = "Climate Change",
-                TargetDemographic = "Young Urban Professionals"
+                Name = "Green Future Initiative", PoliticalAffiliation = PoliticalPosition.CenterLeft,
+                MainIssue = "Climate Change", TargetDemographic = "Environmentally Conscious Citizens"
             };
             await movementRepository.AddAsync(greenMovement);
 
-
-            // --- Must save here to get Organisation IDs before adding more members/relations ---
             await context.SaveChangesAsync();
 
-
-            // --- Add more members and relations now that IDs exist ---
             await partyRepository.AddPartyMemberAsync(centristAlliance.OrganisationId, kenjiTanaka.PersonId,
                 PartyPosition.Spokesperson);
-
             await movementRepository.AddMovementMemberAsync(greenMovement.OrganisationId, eleanorVance.PersonId, false);
             await movementRepository.AddMovementMemberAsync(greenMovement.OrganisationId, sofiaPetrova.PersonId, true);
-
-            // Add a supporting organization
             await movementRepository.AddSupportingOrganisationAsync(greenMovement.OrganisationId,
                 centristAlliance.OrganisationId);
 
-
             // --- 4. Create Bills ---
             var cleanAirAct = new Bill
-            {
-                Name = "Clean Air Act 2.0",
-                Description = "A bill to tighten regulations on industrial emissions.",
-                Status = BillStatus.Proposed,
-                Proposer = sofiaPetrova
-            };
+                { Name = "Clean Air Act 2.0", Status = BillStatus.Proposed, ProposerId = sofiaPetrova.PersonId };
             await billRepository.AddAsync(cleanAirAct);
 
-            // --- Must save here to get Bill ID before adding supporters/opposers ---
             await context.SaveChangesAsync();
 
             await billRepository.SupportBillAsync(cleanAirAct.BillId, eleanorVance.PersonId);
             await billRepository.SupportBillAsync(cleanAirAct.BillId, isabellaRossi.PersonId);
             await billRepository.OpposeBillAsync(cleanAirAct.BillId, kenjiTanaka.PersonId);
 
+            // --- 5. Create Deals (using IDs) ---
 
-            // --- 5. Create Deals ---
-            var deal1 = new Deal
+            // Original Deals
+            await dealRepository.AddAsync(new Deal
             {
-                // Proposer = maximilianSterling, Recipient = eleanorVance,
-                ProposerId = maximilianSterling.PersonId, RecipientId = eleanorVance.PersonId,
-                DealLevel = 2,
-                Description = "Support for deregulation in exchange for campaign funding.",
-                DateProposed = DateTime.UtcNow.AddMonths(-6), DateDecided = DateTime.UtcNow.AddMonths(-5),
-                Status = DealStatus.Accepted
-            };
-            var deal2 = new Deal
+                ProposerId = maximilianSterling.PersonId, RecipientId = eleanorVance.PersonId, DealLevel = 2,
+                Description = "Support for deregulation.", Status = DealStatus.Accepted,
+                DateProposed = DateTime.UtcNow.AddMonths(-6), DateDecided = DateTime.UtcNow.AddMonths(-5)
+            });
+            await dealRepository.AddAsync(new Deal
             {
-                ProposerId = isabellaRossi.PersonId, RecipientId = eleanorVance.PersonId,
-                DealLevel = 3,
-                Description = "Minor zoning variance request.",
-                DateProposed = DateTime.UtcNow.AddMonths(-2), DateDecided = DateTime.UtcNow.AddMonths(-2),
-                Status = DealStatus.AutoRejected
-            };
-            var deal3 = new Deal
+                ProposerId = isabellaRossi.PersonId, RecipientId = kenjiTanaka.PersonId, DealLevel = 4,
+                Description = "Minor zoning variance request.", Status = DealStatus.AutoRejected,
+                DateProposed = DateTime.UtcNow.AddMonths(-2), DateDecided = DateTime.UtcNow.AddMonths(-2)
+            });
+            await dealRepository.AddAsync(new Deal
             {
-                ProposerId = maximilianSterling.PersonId, RecipientId = isabellaRossi.PersonId,
-                DealLevel = 1,
-                Description = "Major government contract steering.",
-                DateProposed = DateTime.UtcNow.AddDays(-10),
-                Status = DealStatus.PendingDecision
-            };
-            
-            await dealRepository.AddAsync(deal1);
-            await dealRepository.AddAsync(deal2);
-            await dealRepository.AddAsync(deal3);
-
+                ProposerId = maximilianSterling.PersonId, RecipientId = isabellaRossi.PersonId, DealLevel = 1,
+                Description = "Major government contract steering.", Status = DealStatus.PendingDecision,
+                DateProposed = DateTime.UtcNow.AddDays(-10)
+            });
+            await dealRepository.AddAsync(new Deal
+            {
+                ProposerId = arthurPendleton.PersonId, RecipientId = helenaMarkov.PersonId, DealLevel = 3,
+                Description = "Infrastructure project approval.", Status = DealStatus.Declined,
+                DateProposed = DateTime.UtcNow.AddDays(-30), DateDecided = DateTime.UtcNow.AddDays(-28)
+            });
+            await dealRepository.AddAsync(new Deal
+            {
+                ProposerId = arthurPendleton.PersonId, RecipientId = eleanorVance.PersonId, DealLevel = 2,
+                Description = "Favorable tax legislation.", Status = DealStatus.Accepted,
+                DateProposed = DateTime.UtcNow.AddDays(-25), DateDecided = DateTime.UtcNow.AddDays(-20)
+            });
+            await dealRepository.AddAsync(new Deal
+            {
+                ProposerId = isabellaRossi.PersonId, RecipientId = helenaMarkov.PersonId, DealLevel = 5,
+                Description = "Dinner meeting to discuss 'cooperation'.", Status = DealStatus.PendingDecision,
+                DateProposed = DateTime.UtcNow.AddDays(-2)
+            });
+            await dealRepository.AddAsync(new Deal
+            {
+                ProposerId = maximilianSterling.PersonId, RecipientId = sofiaPetrova.PersonId, DealLevel = 3,
+                Description = "Delaying environmental report.", Status = DealStatus.Accepted,
+                DateProposed = DateTime.UtcNow.AddMonths(-4), DateDecided = DateTime.UtcNow.AddMonths(-4).AddDays(5)
+            });
+            await dealRepository.AddAsync(new Deal
+            {
+                ProposerId = arthurPendleton.PersonId, RecipientId = kenjiTanaka.PersonId, DealLevel = 2,
+                Description = "Blocking a competitor's import license.", Status = DealStatus.Declined,
+                DateProposed = DateTime.UtcNow.AddMonths(-3), DateDecided = DateTime.UtcNow.AddMonths(-3).AddDays(10)
+            });
+            await dealRepository.AddAsync(new Deal
+            {
+                ProposerId = maximilianSterling.PersonId, RecipientId = kenjiTanaka.PersonId, DealLevel = 5,
+                Description = "Securing tickets to a sports final.", Status = DealStatus.Accepted,
+                DateProposed = DateTime.UtcNow.AddMonths(-1), DateDecided = DateTime.UtcNow.AddMonths(-1)
+            });
+            await dealRepository.AddAsync(new Deal
+            {
+                ProposerId = isabellaRossi.PersonId, RecipientId = sofiaPetrova.PersonId, DealLevel = 2,
+                Description = "Fast-tracking a pharmaceutical patent.", Status = DealStatus.PendingDecision,
+                DateProposed = DateTime.UtcNow.AddDays(-5)
+            });
+            await dealRepository.AddAsync(new Deal
+            {
+                ProposerId = arthurPendleton.PersonId, RecipientId = isabellaRossi.PersonId, DealLevel = 1,
+                Description = "A 'strategic alliance' on media ownership.", Status = DealStatus.PendingDecision,
+                DateProposed = DateTime.UtcNow.AddDays(-1)
+            });
+            await dealRepository.AddAsync(new Deal
+            {
+                ProposerId = isabellaRossi.PersonId, RecipientId = eleanorVance.PersonId, DealLevel = 3,
+                Description = "Appointing a friendly regulator.", Status = DealStatus.Accepted,
+                DateProposed = DateTime.UtcNow.AddYears(-1), DateDecided = DateTime.UtcNow.AddYears(-1).AddDays(15)
+            });
+            await dealRepository.AddAsync(new Deal
+            {
+                ProposerId = maximilianSterling.PersonId, RecipientId = helenaMarkov.PersonId, DealLevel = 4,
+                Description = "Obtaining confidential bidding information.", Status = DealStatus.Declined,
+                DateProposed = DateTime.UtcNow.AddDays(-45), DateDecided = DateTime.UtcNow.AddDays(-40)
+            });
 
             // --- 6. Final Save ---
-            // This single call will commit all the changes made in this session to the database.
             await context.SaveChangesAsync();
             Console.WriteLine("Sample data has been seeded successfully.");
         }
