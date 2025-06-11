@@ -48,6 +48,10 @@ namespace MasFinal.Data
                 { Name = "Arthur Pendleton", Age = 71, Wealth = 2_500_000_000, Types = { PersonType.Oligarch } };
             var helenaMarkov = new Person
                 { Name = "Helena Markov", Age = 49, InfluenceScore = 5, Types = { PersonType.Politician } };
+            
+            // --- TEST CHARACTERS ---
+            var cheapBrokovich = new Person { Name = "Cheap Brokovich", Age = 55, Wealth = 500_000, Types = { PersonType.Oligarch } };
+            var senatorArmstrong = new Person { Name = "Senator Armstrong", Age = 50, InfluenceScore = 10, Types = { PersonType.Politician } };
 
             await personRepository.AddAsync(eleanorVance);
             await personRepository.AddAsync(maximilianSterling);
@@ -56,18 +60,26 @@ namespace MasFinal.Data
             await personRepository.AddAsync(sofiaPetrova);
             await personRepository.AddAsync(arthurPendleton);
             await personRepository.AddAsync(helenaMarkov);
+            
+            await personRepository.AddAsync(cheapBrokovich);
+            await personRepository.AddAsync(senatorArmstrong);
 
             await context.SaveChangesAsync();
 
-            // --- 2. Create Businesses and Workers ---
+            // --- Businesses and Workers ---
             await businessRepository.AddAsync(new Business
                 { Name = "Sterling Enterprises", OwnerId = maximilianSterling.PersonId });
             await businessRepository.AddAsync(new Business
                 { Name = "Rossi Innovations", OwnerId = isabellaRossi.PersonId });
             await businessRepository.AddAsync(new Business
                 { Name = "Pendleton Global", OwnerId = arthurPendleton.PersonId });
+            
+            var brokovichBiz = new Business { Name = "Brokovich Budget Imports", OwnerId = cheapBrokovich.PersonId };
+            brokovichBiz.Workers.Add(new Worker { Name = "Ivan", Position = "Driver", Wage = 75_000});
+            brokovichBiz.Workers.Add(new Worker { Name = "Boris", Position = "Accountant", Wage = 75_000});
+            await businessRepository.AddAsync(brokovichBiz);
 
-            // --- 3. Create Political Organisations and Memberships ---
+            // --- Political Organisations and Memberships ---
             var centristAlliance = new Party
             {
                 Name = "The Centrist Alliance", PoliticalAffiliation = PoliticalPosition.Center,
@@ -86,8 +98,11 @@ namespace MasFinal.Data
                 MainIssue = "Climate Change", TargetDemographic = "Environmentally Conscious Citizens"
             };
             await movementRepository.AddAsync(greenMovement);
-
-            await context.SaveChangesAsync();
+            
+            
+            await context.SaveChangesAsync(); 
+            
+            await partyRepository.AddPartyMemberAsync(centristAlliance.OrganisationId, senatorArmstrong.PersonId, PartyPosition.Member);
 
             await partyRepository.AddPartyMemberAsync(centristAlliance.OrganisationId, kenjiTanaka.PersonId,
                 PartyPosition.Spokesperson);
@@ -106,10 +121,10 @@ namespace MasFinal.Data
             await billRepository.SupportBillAsync(cleanAirAct.BillId, eleanorVance.PersonId);
             await billRepository.SupportBillAsync(cleanAirAct.BillId, isabellaRossi.PersonId);
             await billRepository.OpposeBillAsync(cleanAirAct.BillId, kenjiTanaka.PersonId);
+            await billRepository.SupportBillAsync(cleanAirAct.BillId, senatorArmstrong.PersonId); 
 
-            // --- 5. Create Deals (using IDs) ---
+            // --  Deals ---
 
-            // Original Deals
             await dealRepository.AddAsync(new Deal
             {
                 ProposerId = maximilianSterling.PersonId, RecipientId = eleanorVance.PersonId, DealLevel = 2,
@@ -188,8 +203,19 @@ namespace MasFinal.Data
                 Description = "Obtaining confidential bidding information.", Status = DealStatus.Declined,
                 DateProposed = DateTime.UtcNow.AddDays(-45), DateDecided = DateTime.UtcNow.AddDays(-40)
             });
+            
+            
+            // --- DEALS FOR TEST CASE ---
+            await dealRepository.AddAsync(new Deal { ProposerId = cheapBrokovich.PersonId, RecipientId = kenjiTanaka.PersonId, DealLevel = 5, Description = "Gift basket for the holidays.", Status = DealStatus.Accepted, DateProposed = DateTime.UtcNow.AddMonths(-12), DateDecided = DateTime.UtcNow.AddMonths(-11) });
+            await dealRepository.AddAsync(new Deal { ProposerId = cheapBrokovich.PersonId, RecipientId = sofiaPetrova.PersonId, DealLevel = 5, Description = "Campaign 'donation' (small).", Status = DealStatus.Accepted, DateProposed = DateTime.UtcNow.AddMonths(-10), DateDecided = DateTime.UtcNow.AddMonths(-9) });
+            await dealRepository.AddAsync(new Deal { ProposerId = cheapBrokovich.PersonId, RecipientId = helenaMarkov.PersonId, DealLevel = 4, Description = "Looking the other way on an expired permit.", Status = DealStatus.Accepted, DateProposed = DateTime.UtcNow.AddMonths(-8), DateDecided = DateTime.UtcNow.AddMonths(-7) });
+            await dealRepository.AddAsync(new Deal { ProposerId = cheapBrokovich.PersonId, RecipientId = eleanorVance.PersonId, DealLevel = 4, Description = "Introduction at a gala.", Status = DealStatus.Accepted, DateProposed = DateTime.UtcNow.AddMonths(-6), DateDecided = DateTime.UtcNow.AddMonths(-5) });
 
-            // --- 6. Final Save ---
+            // // This deal from Brokovich to Armstrong should fail the initial check and require proof.
+            // // Proposing a Level 2 deal ($200M required) when he only has ~$150M in assets.
+            // await dealRepository.AddAsync(new Deal { ProposerId = cheapBrokovich.PersonId, RecipientId = senatorArmstrong.PersonId, DealLevel = 2, Description = "Nanomachines, son! (And a small government subsidy).", Status = DealStatus.PreScreening, DateProposed = DateTime.UtcNow.AddDays(-1) });
+
+            // --- Final Save ---
             await context.SaveChangesAsync();
             Console.WriteLine("Sample data has been seeded successfully.");
         }

@@ -65,13 +65,11 @@ public class ProposeDealService(
 
         bool didEvalSucceed = await dealEvaluationService.EvaluateInitialDealEligibility(deal);
 
-        if (!didEvalSucceed) 
-            return deal;
+        if (didEvalSucceed)
+            deal.PreApprove();
         
-        deal.PreApprove();
         // dealRepository.Update(deal);
         await dealRepository.SaveChangesAsync();
-
         return deal;
     }
     

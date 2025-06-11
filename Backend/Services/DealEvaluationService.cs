@@ -1,37 +1,41 @@
 using MasFinal.Models;
 using MasFinal.RepositoryContracts;
+using MasFinal.RepositoryContracts.Businesses;
 using MasFinal.ServiceContracts;
 
 namespace MasFinal.Services;
 
 public class DealEvaluationService(
     IPersonRepository personRepository,
-    IDealRepository dealRepository
+    IDealRepository dealRepository,
+    IBusinessRepository businessRepository
 ) : IDealEvaluationService
 {
     /// <returns>True if the Oligarch is pre-approved, otherwise false.</returns>
     public async Task<bool> EvaluateInitialDealEligibility(Deal deal)
     {
-
         var oligarch = await personRepository.GetPersonWithDetailsAsync(deal.ProposerId);
 
         if (oligarch == null || !oligarch.IsOligarch())
             return false;
+        
+        var businesses = await businessRepository
+            .FindAsync(b => b.OwnerId == deal.ProposerId);
 
         double wealth = oligarch.Wealth ?? 0;
-        double totalPayroll = oligarch.OwnedBusinesses.Sum(b => b.Workers.Sum(w => w.Wage));
-        const double businessValueMultiplier = 1000;
+        double totalPayroll = businesses.Sum(b => b.Workers.Sum(w => w.Wage));
+        const double businessValueMultiplier = 1000; // This multiplier can be adjusted.
 
         double totalAssetValue = wealth + (totalPayroll * businessValueMultiplier);
 
         double requiredValue = deal.DealLevel switch
         {
-            1 => 500_000_000, // Requires $500M in assets for the most expensive deals
-            2 => 200_000_000, // $200M
-            3 => 50_000_000, // $50M
-            4 => 10_000_000, // $10M
-            5 => 1_000_000, // $1M 
-            _ => double.MaxValue // Automatically invalid deal level
+            1 => 500_000_000, 
+            2 => 200_000_000,
+            3 => 50_000_000,
+            4 => 10_000_000, 
+            5 => 1_000_000,   
+            _ => double.MaxValue 
         };
 
         return totalAssetValue >= requiredValue;
