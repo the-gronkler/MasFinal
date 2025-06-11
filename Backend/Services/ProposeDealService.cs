@@ -34,7 +34,16 @@ public class ProposeDealService(
         return await dealRepository.FindAsync(d => d.ProposerId == oligarchId && d.RecipientId == politicianId);
     }
 
-    public async Task<Deal> PreApproveDealAsync(int oligarchId, int politicianId, string dealDescription, int dealLevel)
+    public async Task<IEnumerable<Person>> GetPreviouslyDealtPoliticiansAsync(int oligarchId)
+    {
+        if (oligarchId <= 0)
+            throw new ArgumentException("Oligarch ID must be greater than zero.");
+        
+        return await dealRepository.GetPoliticiansDealtWithByOligarchAsync(oligarchId);
+    }
+
+    
+    public async Task<Deal> TryProposeDealAsync(int oligarchId, int politicianId, string dealDescription, int dealLevel)
     {
         if (oligarchId <= 0 || politicianId <= 0)
             throw new ArgumentException("Oligarch and Politician IDs must be greater than zero.");
@@ -52,8 +61,7 @@ public class ProposeDealService(
             Status = DealStatus.PreScreening
         };
         
-        await dealRepository.AddAsync(deal);
-        await dealRepository.SaveChangesAsync();
+        deal = await dealRepository.AddAsync(deal);
 
         bool didEvalSucceed = await dealEvaluationService.EvaluateInitialDealEligibility(deal);
 
@@ -66,19 +74,7 @@ public class ProposeDealService(
 
         return deal;
     }
-
-   
     
-    
-
-    public async Task<IEnumerable<Person>> GetPreviouslyDealtPoliticiansAsync(int oligarchId)
-    {
-        if (oligarchId <= 0)
-            throw new ArgumentException("Oligarch ID must be greater than zero.");
-        
-        return await dealRepository.GetPoliticiansDealtWithByOligarchAsync(oligarchId);
-    }
-
     public async Task<Deal> ProveDealEligibilityAsync(int dealId, List<int> selectedPoliticians)
     {
         if (dealId <= 0)
@@ -121,7 +117,7 @@ public class ProposeDealService(
     {
         var orphanedDeals = await dealRepository.FindAsync(d => 
             d.Status == DealStatus.PreScreening && 
-            (DateTime.UtcNow - d.DateProposed) > TimeSpan.FromHours(2)
+            (DateTime.UtcNow - d.DateProposed) > TimeSpan.FromHours(1.2)
         );
 
         var deals = orphanedDeals.ToList();
@@ -130,10 +126,7 @@ public class ProposeDealService(
 
         foreach (var deal in deals)
         {
-            bool didEvalSucceed = await dealEvaluationService.EvaluateInitialDealEligibility(deal);
-            if (didEvalSucceed) deal.PreApprove();
-            else deal.AutoReject();
-            
+            deal.AutoReject();
             dealRepository.Update(deal);
         }
 
