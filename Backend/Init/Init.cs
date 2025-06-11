@@ -43,6 +43,7 @@ namespace MasFinal.Init
             services.AddScoped<IBillService, BillService>();
             services.AddScoped<IProposeDealService, ProposeDealService>();
             services.AddScoped<IDealEvaluationService, DealEvaluationService>();
+            services.AddScoped<IDecideDealService, DecideDealService>();
 
             // Data Helpers
             services.AddScoped<IDataSeeder, DataSeeder>();
