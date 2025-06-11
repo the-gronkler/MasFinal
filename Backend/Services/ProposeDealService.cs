@@ -5,11 +5,11 @@ using MasFinal.ServiceContracts;
 namespace MasFinal.Services;
 
 // for ui
-public class OligarchDealService(
+public class ProposeDealService(
     IPersonRepository personRepository,
     IDealRepository dealRepository,
     IDealEvaluationService dealEvaluationService
-    ) : IOligarchDealService
+    ) : IProposeDealService
 {
     public async Task<IEnumerable<Person>> GetOligarchsAsync()
     {

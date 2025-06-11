@@ -70,7 +70,7 @@ ServiceProvider ConfigureServices()
     services.AddScoped<IWorkerRepository, WorkerRepository>();
     
     services.AddScoped<IBillService, BillService>();
-    services.AddScoped<IOligarchDealService, OligarchDealService>();
+    services.AddScoped<IProposeDealService, ProposeDealService>();
     services.AddScoped<IDealEvaluationService, DealEvaluationService>();
 
     services.AddScoped<IDataSeeder, DataSeeder>();

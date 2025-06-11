@@ -2,7 +2,7 @@ using MasFinal.Models;
 
 namespace MasFinal.ServiceContracts;
 
-public interface IOligarchDealService
+public interface IProposeDealService
 {
     // for oligarch:
     Task<IEnumerable<Person>> GetOligarchsAsync();
