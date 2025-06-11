@@ -26,7 +26,7 @@ public class ProposeDealService(
         return await dealRepository.GetDealsForPerson(personId);
     }
 
-    public async Task<IEnumerable<Deal>> GetDealHistoryAsync(int oligarchId, int politicianId)
+    public async Task<IEnumerable<Deal>> GetDealBetweenAsync(int oligarchId, int politicianId)
     {
         if (oligarchId <= 0 || politicianId <= 0)
             throw new ArgumentException("Oligarch and Politician IDs must be greater than zero.");

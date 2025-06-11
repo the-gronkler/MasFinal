@@ -9,7 +9,7 @@ public interface IProposeDealService
     
     Task<IEnumerable<Deal>> GetAllDealsFor(int personId);
     
-    Task<IEnumerable<Deal>> GetDealHistoryAsync(int oligarchId, int politicianId);
+    Task<IEnumerable<Deal>> GetDealBetweenAsync(int oligarchId, int politicianId);
 
     /// <returns>returns politicians with whom the provided oligarch had deals</returns>
     Task<IEnumerable<Person>> GetPreviouslyDealtPoliticiansAsync(int oligarchId);

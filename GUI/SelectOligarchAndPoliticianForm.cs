@@ -38,8 +38,8 @@ public partial class SelectOligarchAndPoliticianForm : Form
 
     private void viewDealsButton_Click(object sender, EventArgs e)
     {
-        var selectedOligarch = (Person)oligarchsListBox.SelectedItem;
-        var selectedPolitician = (Person)politiciansListBox.SelectedItem;
+        var selectedOligarch = (Person?) oligarchsListBox.SelectedItem;
+        var selectedPolitician = (Person?) politiciansListBox.SelectedItem;
 
         if (selectedOligarch == null || selectedPolitician == null)
         {
@@ -55,9 +55,9 @@ public partial class SelectOligarchAndPoliticianForm : Form
             return;
         }
 
-        // Open the DealHistoryForm using the DI container to manage its lifecycle and dependencies
+        
         var dealHistoryForm = Program.ServiceProvider.GetRequiredService<DealHistoryForm>();
         dealHistoryForm.Initialize(selectedOligarch, selectedPolitician);
-        dealHistoryForm.ShowDialog(); // Show as a modal dialog
+        dealHistoryForm.ShowDialog(); 
     }
 }

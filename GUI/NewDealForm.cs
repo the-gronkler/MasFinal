@@ -42,24 +42,30 @@ public partial class NewDealForm : Form
                 (int)dealLevelUpDown.Value
             );
 
-            if (newDeal.Status == DealStatus.PendingDecision)
+            switch (newDeal.Status)
             {
-                MessageBox.Show("Deal proposed successfully and is pending the politician's decision.", "Success",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
-                this.Close();
-            }
-            else if (newDeal.Status == DealStatus.PreScreening)
-            {
-                MessageBox.Show(
-                    "Initial eligibility check failed. Please provide proof of influence by selecting up to 3 politicians you have successfully dealt with before.",
-                    "Proof Required", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                case DealStatus.PendingDecision:
+                    MessageBox.Show("Deal proposed successfully and is pending the politician's decision.", "Success",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    break;
+                case DealStatus.PreScreening:
+                {
+                    MessageBox.Show(
+                        "Initial eligibility check failed. Please provide proof of influence by selecting up to 3 politicians you have successfully dealt with before.",
+                        "Proof Required", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                // Open the proof form
-                var proofForm = Program.ServiceProvider.GetRequiredService<ProveEligibilityForm>();
-                proofForm.Initialize(newDeal.DealId, _oligarch.PersonId);
-                proofForm.ShowDialog();
-                this.Close(); // Close the new deal form after the proof form is handled
+                    // Open the proof form
+                    var proofForm = Program.ServiceProvider.GetRequiredService<ProveEligibilityForm>();
+                    proofForm.Initialize(newDeal.DealId, _oligarch.PersonId);
+                    proofForm.ShowDialog();
+                    // Close the new deal form after the proof form is handled
+                    break;
+                }
+                default:
+                    throw new ArgumentOutOfRangeException("Deal created with an unexpected status: " + newDeal.Status);
             }
+
+            this.Close();
         }
         catch (Exception ex)
         {

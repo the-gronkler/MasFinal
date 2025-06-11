@@ -31,10 +31,13 @@ public partial class DealHistoryForm : Form
         
     private async Task LoadDealHistory()
     {
-        if (_oligarch == null || _politician == null) return;
+        if (_oligarch == null || _politician == null) 
+            return;
+        
         try
         {
-            var deals = await _proposeDealService.GetDealHistoryAsync(_oligarch.PersonId, _politician.PersonId);
+            var deals = await _proposeDealService.GetDealBetweenAsync(
+                _oligarch.PersonId, _politician.PersonId);
                 
             dealsDataGridView.DataSource = deals.Select(d => new
             {
