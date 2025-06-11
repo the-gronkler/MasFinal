@@ -21,6 +21,11 @@ public class ProposeDealService(
         return await personRepository.FindAsync(p => p.IsPolitician());
     }
 
+    public async Task<IEnumerable<Deal>> GetAllDealsFor(int personId)
+    {
+        return await dealRepository.GetDealsForPerson(personId);
+    }
+
     public async Task<IEnumerable<Deal>> GetDealHistoryAsync(int oligarchId, int politicianId)
     {
         if (oligarchId <= 0 || politicianId <= 0)
