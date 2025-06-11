@@ -25,6 +25,7 @@ namespace MasFinal.Data
     {
         public async Task SeedIfEmptyAsync()
         {
+            Console.WriteLine(AppDbContext.DbPath);
             // Only seed if there's no data
             if (await personRepository.GetAllAsync() is { } people && people.Any())
                 return;
@@ -59,6 +60,8 @@ namespace MasFinal.Data
             isabellaRossi = await personRepository.AddAsync(isabellaRossi);
             kenjiTanaka = await personRepository.AddAsync(kenjiTanaka);
             sofiaPetrova = await personRepository.AddAsync(sofiaPetrova);
+            
+            await context.SaveChangesAsync(); // to update person ids
 
 
             // --- 2. Create Businesses and Workers ---
@@ -138,25 +141,30 @@ namespace MasFinal.Data
             // --- 5. Create Deals ---
             var deal1 = new Deal
             {
-                Proposer = maximilianSterling, Recipient = eleanorVance, DealLevel = 2,
+                // Proposer = maximilianSterling, Recipient = eleanorVance,
+                ProposerId = maximilianSterling.PersonId, RecipientId = eleanorVance.PersonId,
+                DealLevel = 2,
                 Description = "Support for deregulation in exchange for campaign funding.",
                 DateProposed = DateTime.UtcNow.AddMonths(-6), DateDecided = DateTime.UtcNow.AddMonths(-5),
                 Status = DealStatus.Accepted
             };
             var deal2 = new Deal
             {
-                Proposer = isabellaRossi, Recipient = kenjiTanaka, DealLevel = 4,
+                ProposerId = isabellaRossi.PersonId, RecipientId = eleanorVance.PersonId,
+                DealLevel = 3,
                 Description = "Minor zoning variance request.",
                 DateProposed = DateTime.UtcNow.AddMonths(-2), DateDecided = DateTime.UtcNow.AddMonths(-2),
                 Status = DealStatus.AutoRejected
             };
             var deal3 = new Deal
             {
-                Proposer = maximilianSterling, Recipient = isabellaRossi, DealLevel = 1,
+                ProposerId = maximilianSterling.PersonId, RecipientId = isabellaRossi.PersonId,
+                DealLevel = 1,
                 Description = "Major government contract steering.",
                 DateProposed = DateTime.UtcNow.AddDays(-10),
                 Status = DealStatus.PendingDecision
             };
+            
             await dealRepository.AddAsync(deal1);
             await dealRepository.AddAsync(deal2);
             await dealRepository.AddAsync(deal3);

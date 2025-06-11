@@ -15,6 +15,9 @@ public class DealRepository(AppDbContext context)
     /// </summary>
     public override async Task<Deal> AddAsync(Deal deal)
     {
+        if (deal == null)
+            throw new ArgumentNullException(nameof(deal), "Deal cannot be null.");
+        
         if (deal.ProposerId == deal.RecipientId)
             throw new InvalidOperationException("A person cannot propose a deal to themselves.");
 

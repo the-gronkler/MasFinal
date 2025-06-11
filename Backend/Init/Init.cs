@@ -1,4 +1,5 @@
 using MasFinal.Data;
+using MasFinal.Models.Businesses;
 using MasFinal.Repositories;
 using MasFinal.Repositories.Businesses;
 using MasFinal.Repositories.PoliticalOrganisations;
@@ -21,20 +22,20 @@ public static class Init
 
         var scopedProvider = scope.ServiceProvider;
 
-        // init static members
-        var workerRepository = scopedProvider.GetRequiredService<IWorkerRepository>();
-        Console.WriteLine("Initializing static application data...");
-        await workerRepository.GetMinimumWageAsync();
-        Console.WriteLine(
-            $"Worker.MinimumWage has been initialized to: {MasFinal.Models.Businesses.Worker.MinimumWage:C}");
-
+     
 
         var context = scopedProvider.GetRequiredService<AppDbContext>();
         Console.WriteLine("Ensuring database schema is created...");
         await context.Database.EnsureCreatedAsync();
         Console.WriteLine("Confirmed");
 
-
+        // init static members
+        var workerRepository = scopedProvider.GetRequiredService<IWorkerRepository>();
+        Console.WriteLine("Initializing static application data...");
+        await workerRepository.GetMinimumWageAsync();
+        Console.WriteLine(
+            $"Worker.MinimumWage has been initialized to: {Worker.MinimumWage:C}");
+        
         var dataSeeder = scopedProvider.GetRequiredService<IDataSeeder>();
         var dataDisplayer = scopedProvider.GetRequiredService<IDataDisplayer>();
 

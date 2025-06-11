@@ -15,6 +15,7 @@ public enum DealStatus
 public class Deal
 {
 
+
     [Key]
     public int DealId { get; set; }
 

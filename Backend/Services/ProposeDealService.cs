@@ -51,7 +51,7 @@ public class ProposeDealService(
         if (string.IsNullOrWhiteSpace(dealDescription))
             throw new ArgumentException("Deal description cannot be empty.");
         
-        var deal = new Deal
+        var deal = new Deal()
         {
             ProposerId = oligarchId,
             RecipientId = politicianId,
