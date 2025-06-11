@@ -4,11 +4,11 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace GUI;
 
-public partial class DealSelectorForm : Form
+public partial class SelectOligarchAndPoliticianForm : Form
 {
     private readonly IProposeDealService _proposeDealService;
 
-    public DealSelectorForm(IProposeDealService proposeDealService)
+    public SelectOligarchAndPoliticianForm(IProposeDealService proposeDealService)
     {
         _proposeDealService = proposeDealService;
         InitializeComponent();

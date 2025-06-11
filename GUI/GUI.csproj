@@ -17,7 +17,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Update="DealSelectorForm.cs">
+      <Compile Update="SelectOligarchAndPoliticianForm.cs">
         <SubType>Form</SubType>
       </Compile>
       <Compile Update="DealHistoryForm.cs">

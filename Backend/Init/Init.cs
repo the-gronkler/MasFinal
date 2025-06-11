@@ -15,7 +15,7 @@ namespace MasFinal.Init;
 
 public static class Init
 {
-    public static async void InitDb(ServiceProvider serviceProvider, bool showData = false)
+    public static async Task InitDb(IServiceProvider serviceProvider, bool showData = false)
     {
         using var scope = serviceProvider.CreateScope();
 

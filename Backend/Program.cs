@@ -16,7 +16,7 @@ using Microsoft.Extensions.Logging;
 Console.WriteLine("<--- MAS FINAL PROJECT---->\n\n");
 
 var serviceProvider = Init.ConfigureServices();
-Init.InitDb(serviceProvider, true);
+await Init.InitDb(serviceProvider, true);
 
 Console.WriteLine("\n\nProgram finished.");
 

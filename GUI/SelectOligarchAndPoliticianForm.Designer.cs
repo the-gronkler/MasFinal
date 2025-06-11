@@ -1,6 +1,6 @@
 namespace GUI
 {
-    partial class DealSelectorForm
+    partial class SelectOligarchAndPoliticianForm
     {
         private System.ComponentModel.IContainer components = null;
 
@@ -72,7 +72,7 @@ namespace GUI
             this.viewDealsButton.UseVisualStyleBackColor = true;
             this.viewDealsButton.Click += new System.EventHandler(this.viewDealsButton_Click);
             // 
-            // DealSelectorForm
+            // SelectOligarchAndPoliticianForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -82,7 +82,7 @@ namespace GUI
             this.Controls.Add(this.label1);
             this.Controls.Add(this.politiciansListBox);
             this.Controls.Add(this.oligarchsListBox);
-            this.Name = "DealSelectorForm";
+            this.Name = "SelectOligarchAndPoliticianForm";
             this.Text = "Select Participants";
             this.Load += new System.EventHandler(this.DealSelectorForm_Load);
             this.ResumeLayout(false);

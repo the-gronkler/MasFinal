@@ -1,4 +1,5 @@
 using MasFinal.Data;
+using MasFinal.Init;
 using MasFinal.Repositories;
 using MasFinal.Repositories.Businesses;
 using MasFinal.Repositories.PoliticalOrganisations;
@@ -14,13 +15,10 @@ namespace GUI;
 
 public static class Program
 {
-    public static IServiceProvider ServiceProvider { get; private set; }
+    public static IServiceProvider ServiceProvider { get; private set; } = null!;
 
-    /// <summary>
-    /// The main entry point for the application.
-    /// </summary>
     [STAThread]
-    static async Task Main()
+    private static async Task Main()
     {
         Application.SetHighDpiMode(HighDpiMode.SystemAware);
         Application.EnableVisualStyles();
@@ -31,11 +29,10 @@ public static class Program
         ConfigureServices(services);
         ServiceProvider = services.BuildServiceProvider();
 
-        // Initialize the database (seeding data if necessary)
-        await InitDb(ServiceProvider);
+        await Init.InitDb(ServiceProvider);
 
         // Run the main form
-        var mainForm = ServiceProvider.GetRequiredService<global::GUI.DealSelectorForm>();
+        var mainForm = ServiceProvider.GetRequiredService<global::GUI.SelectOligarchAndPoliticianForm>();
         Application.Run(mainForm);
     }
 
@@ -43,7 +40,7 @@ public static class Program
     {
         services.AddDbContext<AppDbContext>(options =>
             options.UseSqlite($"Data Source={AppDbContext.DbPath}")
-                //.LogTo(Console.WriteLine, LogLevel.Information) // Optional: for debugging
+                //.LogTo(Console.WriteLine, LogLevel.Information) //  for debug
                 .EnableSensitiveDataLogging()
         );
 
@@ -63,33 +60,15 @@ public static class Program
             
         // Register Data Helpers
         services.AddScoped<IDataSeeder, DataSeeder>();
-        services.AddScoped<IDataDisplayer, DataDisplayer>(); // Not used by GUI, but good practice
+        services.AddScoped<IDataDisplayer, DataDisplayer>(); 
 
         // Register Forms
-        services.AddTransient<DealSelectorForm>();
+        services.AddTransient<SelectOligarchAndPoliticianForm>();
         services.AddTransient<DealHistoryForm>();
         services.AddTransient<NewDealForm>();
         services.AddTransient<ProveEligibilityForm>();
     }
 
-    private static async Task InitDb(IServiceProvider serviceProvider)
-    {
-        using var scope = serviceProvider.CreateScope();
-        var scopedProvider = scope.ServiceProvider;
-
-        // init static members
-        var workerRepository = scopedProvider.GetRequiredService<IWorkerRepository>();
-        Console.WriteLine("Initializing static application data...");
-        await workerRepository.GetMinimumWageAsync();
-        Console.WriteLine($"Worker.MinimumWage has been initialized to: {MasFinal.Models.Businesses.Worker.MinimumWage:C}");
-
-        var context = scopedProvider.GetRequiredService<AppDbContext>();
-        Console.WriteLine("Ensuring database schema is created...");
-        await context.Database.EnsureCreatedAsync();
-        Console.WriteLine("Database schema confirmed.");
-
-        var dataSeeder = scopedProvider.GetRequiredService<IDataSeeder>();
-        await dataSeeder.SeedIfEmptyAsync();
-    }
+    
 }
 
