@@ -2,6 +2,7 @@ using MasFinal.Data;
 using MasFinal.Models;
 using MasFinal.Models.Businesses;
 using MasFinal.RepositoryContracts.Businesses;
+using Microsoft.EntityFrameworkCore;
 
 namespace MasFinal.Repositories.Businesses;
 
@@ -30,6 +31,14 @@ public class WorkerRepository(AppDbContext context)
     public override void Update(Worker entity)
     {
         ValidateWage(entity);
+        
+        var originalEntity = _context.Entry(entity).OriginalValues;
+        var currentEntity = _context.Entry(entity).CurrentValues;
+        
+        if (originalEntity.GetValue<int>(nameof(Worker.BusinessId)) 
+            != currentEntity.GetValue<int>(nameof(Worker.BusinessId)))
+            throw new InvalidOperationException("A Worker cannot be moved to a different Business. The employment relationship is permanent.");
+        
         base.Update(entity);
     }
     
@@ -78,11 +87,11 @@ public class WorkerRepository(AppDbContext context)
         config.Value = newValue.ToString();
         
         Worker.MinimumWage = newValue;
-            
-        // up wages for all workers
-        var workers = _context.Workers.Where(w => w.Wage < newValue);
-        foreach (var worker in workers)
-            worker.Wage = Worker.MinimumWage;
+        
+        await _context.Workers
+            .Where(w => w.Wage < newValue)
+            .ExecuteUpdateAsync(s => s.SetProperty(w => w.Wage, w => newValue));
+      
     }
     
 }

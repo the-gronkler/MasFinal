@@ -7,3 +7,5 @@ namespace MasFinal.Repositories.Businesses;
 
 public class BusinessRepository(AppDbContext context) 
     : Repository<Business>(context), IBusinessRepository;
+    
+    
