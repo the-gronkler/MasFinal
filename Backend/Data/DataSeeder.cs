@@ -211,10 +211,7 @@ namespace MasFinal.Data
             await dealRepository.AddAsync(new Deal { ProposerId = cheapBrokovich.PersonId, RecipientId = helenaMarkov.PersonId, DealLevel = 4, Description = "Looking the other way on an expired permit.", Status = DealStatus.Accepted, DateProposed = DateTime.UtcNow.AddMonths(-8), DateDecided = DateTime.UtcNow.AddMonths(-7) });
             await dealRepository.AddAsync(new Deal { ProposerId = cheapBrokovich.PersonId, RecipientId = eleanorVance.PersonId, DealLevel = 4, Description = "Introduction at a gala.", Status = DealStatus.Accepted, DateProposed = DateTime.UtcNow.AddMonths(-6), DateDecided = DateTime.UtcNow.AddMonths(-5) });
 
-            // // This deal from Brokovich to Armstrong should fail the initial check and require proof.
-            // // Proposing a Level 2 deal ($200M required) when he only has ~$150M in assets.
-            // await dealRepository.AddAsync(new Deal { ProposerId = cheapBrokovich.PersonId, RecipientId = senatorArmstrong.PersonId, DealLevel = 2, Description = "Nanomachines, son! (And a small government subsidy).", Status = DealStatus.PreScreening, DateProposed = DateTime.UtcNow.AddDays(-1) });
-
+           
             // --- Final Save ---
             await context.SaveChangesAsync();
             Console.WriteLine("Sample data has been seeded successfully.");

@@ -122,11 +122,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
             .WithMany(b => b.Workers)
             .HasForeignKey(w => w.BusinessId)
             .OnDelete(DeleteBehavior.Cascade); // Remove workers if business is deleted
-            
         
-        
-        // -- Constraints --
-        // -- Unique --
+        // -- Unique Constraint --
         modelBuilder.Entity<PoliticalOrganisation>().HasIndex(o => o.Name).IsUnique();
         
     }

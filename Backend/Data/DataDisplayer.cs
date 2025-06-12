@@ -1,8 +1,3 @@
-// --- C:\ProgProjects\MasFinal\Backend\Data\DataDisplayer.cs ---
-using MasFinal.Models;
-using MasFinal.RepositoryContracts;
-using MasFinal.RepositoryContracts.Businesses;
-using MasFinal.RepositoryContracts.PoliticalOrganisations;
 using Microsoft.EntityFrameworkCore;
 
 namespace MasFinal.Data
@@ -34,7 +29,7 @@ namespace MasFinal.Data
                 .ThenInclude(b => b.Workers)
                 .ToListAsync();
 
-            if (!persons.Any())
+            if (persons.Count == 0)
             {
                 Console.WriteLine("No persons found in the system.");
                 return;
@@ -54,21 +49,17 @@ namespace MasFinal.Data
                     Console.WriteLine($"  - Oligarch Wealth: {person.Wealth:C}");
                 }
 
-                if (person.OwnedBusinesses.Any())
+                if (person.OwnedBusinesses.Count == 0) continue;
+                Console.WriteLine("  - Owned Businesses:");
+                foreach (var business in person.OwnedBusinesses)
                 {
-                    Console.WriteLine("  - Owned Businesses:");
-                    foreach (var business in person.OwnedBusinesses)
-                    {
-                        Console.WriteLine($"    - {business.Name} (Avg. Wage: {business.AverageWage:C})");
-                        if (business.Workers.Any())
-                        {
-                            Console.WriteLine("      - Workers:");
-                            foreach (var worker in business.Workers)
-                            {
-                                Console.WriteLine($"        - {worker.Name ?? "Unnamed"}, Position: {worker.Position}, Wage: {worker.Wage:C}");
-                            }
-                        }
-                    }
+                    Console.WriteLine($"    - {business.Name} (Avg. Wage: {business.AverageWage:C})");
+                    if (business.Workers.Count == 0) 
+                        continue;
+                    Console.WriteLine("      - Workers:");
+                    foreach (var worker in business.Workers)
+                        Console.WriteLine($"        - {worker.Name ?? "Unnamed"}, Position: {worker.Position}, Wage: {worker.Wage:C}");
+                        
                 }
             }
         }
@@ -77,14 +68,14 @@ namespace MasFinal.Data
         {
             Console.WriteLine("\n\n--- Political Organisations ---");
 
-            // Display Parties
+            
             var parties = await context.Parties
                 .Include(p => p.Memberships)
                 .ThenInclude(m => m.Politician)
                 .ToListAsync();
 
             Console.WriteLine("\n[Parties]");
-            if (!parties.Any()) Console.WriteLine("No parties found.");
+            if (parties.Count == 0) Console.WriteLine("No parties found.");
             foreach (var party in parties)
             {
                 Console.WriteLine($"\n{party.Name} ({party.PoliticalAffiliation})");
@@ -105,7 +96,7 @@ namespace MasFinal.Data
                 .ToListAsync();
 
             Console.WriteLine("\n[Movements]");
-            if (!movements.Any()) Console.WriteLine("No movements found.");
+            if (movements.Count == 0) Console.WriteLine("No movements found.");
             foreach (var movement in movements)
             {
                 Console.WriteLine($"\n{movement.Name} ({movement.PoliticalAffiliation})");
@@ -117,14 +108,12 @@ namespace MasFinal.Data
                     var status = membership.EndDate.HasValue ? $"Ended: {membership.EndDate.Value:d}" : "Active";
                     Console.WriteLine($"    - {membership.Politician.Name} as {role} (Started: {membership.StartDate:d}, Status: {status})");
                 }
-                if (movement.SupportedBy.Any())
-                {
-                    Console.WriteLine("  - Supported By:");
-                    foreach (var org in movement.SupportedBy)
-                    {
-                        Console.WriteLine($"    - {org.Name}");
-                    }
-                }
+
+                if (movement.SupportedBy.Count == 0) continue;
+                Console.WriteLine("  - Supported By:");
+                foreach (var org in movement.SupportedBy)
+                    Console.WriteLine($"    - {org.Name}");
+                
             }
         }
 
@@ -137,7 +126,7 @@ namespace MasFinal.Data
                 .Include(b => b.Opposers)
                 .ToListAsync();
 
-            if (!bills.Any())
+            if (bills.Count == 0)
             {
                 Console.WriteLine("No bills found in the system.");
                 return;
@@ -161,7 +150,7 @@ namespace MasFinal.Data
                 .OrderBy(d => d.DateProposed)
                 .ToListAsync();
 
-            if (!deals.Any())
+            if (deals.Count == 0)
             {
                 Console.WriteLine("No deals found in the system.");
                 return;

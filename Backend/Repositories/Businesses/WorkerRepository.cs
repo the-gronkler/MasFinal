@@ -26,7 +26,7 @@ public class WorkerRepository(AppDbContext context)
     }
 
     /// <summary>
-    /// Enforces the minimum wage constraint on update.
+    /// Enforces the minimum wage and compositiion constraints on update.
     /// </summary>
     public override void Update(Worker entity)
     {
