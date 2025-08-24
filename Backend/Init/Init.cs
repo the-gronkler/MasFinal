@@ -66,7 +66,7 @@ namespace MasFinal.Init
             var context = scopedProvider.GetRequiredService<AppDbContext>();
             Console.WriteLine("Ensuring database schema is created...");
             await context.Database.EnsureCreatedAsync();
-            Console.WriteLine("Confirmed.");
+            Console.WriteLine("Confirmed, database at " + AppDbContext.DbPath);
 
             // Initialize static class members from the database
             var workerRepository = scopedProvider.GetRequiredService<IWorkerRepository>();

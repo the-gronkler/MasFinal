@@ -31,7 +31,9 @@ public class ProposeDealService(
         if (oligarchId <= 0 || politicianId <= 0)
             throw new ArgumentException("Oligarch and Politician IDs must be greater than zero.");
 
-        return await dealRepository.FindAsync(d => d.ProposerId == oligarchId && d.RecipientId == politicianId);
+        // return await dealRepository.FindAsync(d => d.ProposerId == oligarchId && d.RecipientId == politicianId);
+        return (await dealRepository.GetDealsForPerson(oligarchId))
+            .Where(d => d.ProposerId == oligarchId && d.RecipientId == politicianId);
     }
 
     public async Task<IEnumerable<Person>> GetPreviouslyDealtPoliticiansAsync(int oligarchId)
